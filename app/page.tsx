@@ -72,6 +72,7 @@ export default function Home() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const orderFileInputRef = useRef<HTMLInputElement>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
@@ -699,9 +700,20 @@ export default function Home() {
                         <button className="btn-delete-img" onClick={() => handleDeleteOrderImage(img.id, img.image_path)}>✕</button>
                       </div>
                     ))}
-                    <div className="image-add-card" onClick={() => fileInputRef.current?.click()}>
+                    <div className="image-add-card" onClick={() => orderFileInputRef.current?.click()}>
                       {uploadingOrderImage ? <div className="spinner" /> : <span>+ 追加</span>}
                     </div>
+                    <input
+                      ref={orderFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="file-input"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleOrderImageUpload(file);
+                        e.target.value = ''; // 連続で同じファイルを選択可能に
+                      }}
+                    />
                   </div>
 
                   <dl className="order-detail">
