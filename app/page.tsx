@@ -1,14 +1,23 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-customer_name: string;
-recipient_name: string;
-gift_message: string;
-product_sku: string;
-status: string;
-notes: string;
-imported_at: string;
-updated_at: string;
+import imageCompression from 'browser-image-compression';
+
+type Order = {
+  id: number;
+  order_number: string;
+  goq_number: string;
+  ship_date: string;
+  delivery_date: string;
+  customer_email: string;
+  customer_name: string;
+  recipient_name: string;
+  gift_message: string;
+  product_sku: string;
+  status: string;
+  notes: string;
+  imported_at: string;
+  updated_at: string;
 };
 
 type Product = {
@@ -27,15 +36,15 @@ type Stats = {
 
 const STATUS_LABELS: Record<string, string> = {
   pending: '未対応',
-  image_sent: '画像送付済',
-  review_requested: 'レビュー依頼済',
+  captured: '撮影済',
+  sent: '送信済',
   completed: '完了',
 };
 
 const STATUS_OPTIONS = [
   { value: 'pending', label: '未対応' },
-  { value: 'image_sent', label: '画像送付済' },
-  { value: 'review_requested', label: 'レビュー依頼済' },
+  { value: 'captured', label: '撮影済' },
+  { value: 'sent', label: '送信済' },
   { value: 'completed', label: '完了' },
 ];
 
@@ -393,11 +402,11 @@ export default function Home() {
                 <div className="stat-value">{stats.pending}</div>
               </div>
               <div
-                className={`stat-card sent ${filterStatus === 'image_sent' || filterStatus === 'review_requested' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('image_sent')}
+                className={`stat-card sent ${filterStatus === 'captured' || filterStatus === 'sent' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('captured')}
               >
-                <div className="stat-label">画像送付済/依頼済</div>
-                <div className="stat-value">{stats.image_sent + stats.review_requested}</div>
+                <div className="stat-label">撮影済 / 送信済</div>
+                <div className="stat-value">{(stats as any).captured + (stats as any).sent || 0}</div>
               </div>
               <div
                 className={`stat-card done ${filterStatus === 'completed' ? 'active' : ''}`}
@@ -500,7 +509,7 @@ export default function Home() {
                               title="タップしてこの注文の写真を撮影/管理"
                             >
                               <div className="order-thumb-container">
-                                {order.status === 'image_sent' || order.status === 'review_requested' ? (
+                                {order.status === 'captured' || order.status === 'sent' ? (
                                   <div className="order-thumb-ready">📸</div>
                                 ) : (
                                   <div className="no-image-thumb-clickable">🌸</div>
