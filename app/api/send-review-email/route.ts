@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
 
     await transporter.sendMail(mailOptions);
 
-    // ステータスを「レビュー依頼済」に自動更新
-    await updateOrderStatus(order_number, 'review_requested');
+    // ステータスを「送信済」に自動更新
+    await updateOrderStatus(order_number, 'sent');
 
     return NextResponse.json({ success: true });
   } catch (err) {

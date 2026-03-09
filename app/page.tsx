@@ -684,7 +684,6 @@ export default function Home() {
             </div>
             {(() => {
               const product = productMap[selectedOrder.product_sku];
-              const isAmazon = isAmazonEmail(selectedOrder.customer_email || '');
               return (
                 <div>
                   <div className="order-images-preview">
@@ -711,9 +710,8 @@ export default function Home() {
                     <dt>注文者</dt><dd>{selectedOrder.customer_name}</dd>
                     <dt>送付先</dt><dd>{selectedOrder.recipient_name}</dd>
                     <dt>メールアドレス</dt>
-                    <dd style={{ fontSize: '12px', wordBreak: 'break-all', color: isAmazon ? 'var(--text-muted)' : 'var(--text-primary)' }}>
+                    <dd style={{ fontSize: '12px', wordBreak: 'break-all', color: 'var(--text-primary)' }}>
                       {selectedOrder.customer_email}
-                      {isAmazon && ' ※Amazon匿名アドレス'}
                     </dd>
                     <dt>商品SKU</dt><dd style={{ fontFamily: 'monospace', color: 'var(--accent-secondary)' }}>{selectedOrder.product_sku}</dd>
                     <dt>出荷日</dt><dd>{selectedOrder.ship_date}</dd>
