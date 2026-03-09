@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const mailOptions = {
       from: `"シラハナ フラワー" <${process.env.SMTP_USER || 'info@sirahana.com'}>`,
       to: customer_email,
-      subject: '【重要】ご注文商品の画像を添付しております（シラハナフラワー）',
+      subject: '【シラハナフラワー】ご注文商品の発送前のご報告（お写真付き）',
       html: `
 <!DOCTYPE html>
 <html lang="ja">
@@ -48,33 +48,20 @@ export async function POST(req: NextRequest) {
   <div style="max-width:600px;margin:0 auto;border:1px solid #eee;padding:30px;border-radius:8px;">
     <p style="margin:0 0 20px;">${recipientDisplay}</p>
     
-    <p style="margin:0 0 20px;font-weight:bold;">【重要】この度はご注文いただき誠にありがとうございます。</p>
+    <p style="margin:0 0 20px;font-weight:bold;">この度はシラハナフラワーへのご注文、誠にありがとうございます。</p>
     
     <p style="margin:0 0 20px;">
-      ご注文番号: <strong>${order_number}</strong><br>
-      商品の画像を添付しておりますのでご確認ください。
+      ご注文いただきました商品（受注番号: ${order_number}）の発送準備が整いました。<br>
+      実際にお届けするお花の状態を事前にご確認いただけるよう、撮影したお写真を本メールに添付いたしました。
     </p>
 
-    ${imageSection}
-
-    <p style="margin:0 0 20px;">
-      よろしければ、簡単で構いませんので、率直な感想や使用感などの【商品レビュー】を書いて頂けると幸いです。<br>
-      実際に購入、ご使用されたお客様のコメントは、これから商品の購入を検討される多くのお客様にとってなによりの参考になります。<br>
-      また、至らぬ点などは今後の商品の改善や品質の向上にも役立たせて頂きます。
-    </p>
-
-    <p style="margin:0 0 10px;text-align:center;font-weight:bold;">
-      ↓こちらのリンクより、すぐにお書き頂けます↓
-    </p>
-    <div style="text-align:center;margin:0 0 30px;">
-      <a href="https://www.amazon.co.jp/gp/your-account/order-history/ref=nav_youraccount_jp_ab_ya_ad_yo" 
-         style="display:inline-block;background:#f78fb3;color:#fff;text-decoration:none;padding:12px 30px;border-radius:4px;font-weight:bold;">
-        Amazonで購入履歴を確認・レビューを書く
-      </a>
+    <div style="margin:20px 0;text-align:center;color:#666;font-size:14px;">
+      （※お写真は本メールの添付ファイルとしてもご確認いただけます）
     </div>
 
     <p style="margin:0 0 20px;">
-      何か到着した商品に不備や問題などありましたら、可能な限りの対応をさせて頂きますので、メールよりご連絡をお待ちしております。
+      お届けまで今しばらくお待ちくださいませ。<br>
+      何か到着した商品に不備や問題などありましたら、お手数ですが本メールへの返信にてご連絡をいただけますと幸いです。
     </p>
 
     <hr style="border:0;border-top:1px solid #eee;margin:30px 0;">
@@ -86,6 +73,11 @@ export async function POST(req: NextRequest) {
 </body>
 </html>
       `.trim(),
+      attachments: imagesToDisplay.map((url: string, index: number) => ({
+        filename: `flower_${index + 1}.jpg`,
+        path: url,
+        cid: `flower_image_${index}` // HTML内で <img src="cid:..." /> を使う場合用
+      }))
     };
 
     await transporter.sendMail(mailOptions);

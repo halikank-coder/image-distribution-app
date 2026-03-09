@@ -1,22 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-
-type Order = {
-  id: number;
-  order_number: string;
-  goq_number: string;
-  ship_date: string;
-  delivery_date: string;
-  customer_email: string;
-  customer_name: string;
-  recipient_name: string;
-  gift_message: string;
-  product_sku: string;
-  status: string;
-  notes: string;
-  imported_at: string;
-  updated_at: string;
+customer_name: string;
+recipient_name: string;
+gift_message: string;
+product_sku: string;
+status: string;
+notes: string;
+imported_at: string;
+updated_at: string;
 };
 
 type Product = {
@@ -132,18 +124,32 @@ export default function Home() {
   const handleOrderImageUpload = async (file: File) => {
     if (!selectedOrder) return;
     setUploadingOrderImage(true);
-    const form = new FormData();
-    form.append('order_number', selectedOrder.order_number);
-    form.append('image', file);
+
     try {
+      // 画像圧縮のオプション
+      const options = {
+        maxSizeMB: 0.8,
+        maxWidthOrHeight: 1280,
+        useWebWorker: true,
+      };
+
+      const compressedFile = await imageCompression(file, options);
+
+      const form = new FormData();
+      form.append('order_number', selectedOrder.order_number);
+      form.append('image', compressedFile);
+
       const res = await fetch('/api/order-images', { method: 'POST', body: form });
       const data = await res.json();
       if (data.success) {
-        showToast('画像をアップロードしました');
+        showToast('画像をアップロードしました（最適化済み）');
         fetchOrderImages(selectedOrder.order_number);
       } else {
         showToast(data.error || 'アップロードに失敗しました', 'error');
       }
+    } catch (err) {
+      console.error('Compression error:', err);
+      showToast('画像の処理に失敗しました', 'error');
     } finally {
       setUploadingOrderImage(false);
     }
