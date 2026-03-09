@@ -249,14 +249,10 @@ export default function Home() {
 
   const sendReviewEmail = async (order: Order) => {
     if (sendingEmail) return;
-    if (!order.customer_email || order.customer_email.includes('marketplace')) {
-      showToast('このメールアドレスには送信できません（Amazon匿名アドレス）', 'error');
-      return;
-    }
     const product = productMap[order.product_sku];
     const images = selectedOrderImages.length > 0 ? selectedOrderImages : (product?.image_path ? [{ id: 0, image_path: product.image_path }] : []);
 
-    if (!confirm(`${order.customer_name}様へレビュー依頼メールを送信しますか？\n\n【送信内容の確認】\n・宛先: ${order.customer_email}\n・注文番号: ${order.order_number}\n・商品名: ${product?.name || order.product_sku}\n・画像: ${images.length > 0 ? `${images.length}枚` : 'なし'}\n\n※「OK」を押すと送信されます。`)) return;
+    if (!confirm(`${order.customer_name}様へ「お写真報告メール」を送信しますか？\n\n【送信内容の確認】\n・宛先: ${order.customer_email}\n・注文番号: ${order.order_number}\n・商品名: ${product?.name || order.product_sku}\n・画像: ${images.length > 0 ? `${images.length}枚` : 'なし'}\n\n※「OK」を押すと送信されます。`)) return;
 
     setBulkProcessing(true); // 送信中表示用
     try {
@@ -275,10 +271,10 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast('✅ レビュー依頼メールを送信しました！');
+        showToast('✅ お写真報告メールを送信しました！');
         fetchOrders();
         if (selectedOrder?.order_number === order.order_number) {
-          setSelectedOrder({ ...selectedOrder, status: 'review_requested' });
+          setSelectedOrder({ ...selectedOrder, status: 'image_sent' });
         }
       } else {
         showToast(data.error || 'メール送信に失敗しました', 'error');
@@ -444,7 +440,7 @@ export default function Home() {
                       onClick={bulkSendEmails}
                       disabled={bulkProcessing}
                     >
-                      {bulkProcessing ? '処理中...' : '📧 一括メール送信'}
+                      {bulkProcessing ? '処理中...' : '📧 一括報告メール送信'}
                     </button>
                     <button
                       className="btn btn-primary btn-sm"
@@ -543,16 +539,14 @@ export default function Home() {
                             <td>
                               <div className="actions">
                                 <button className="btn btn-ghost btn-sm" onClick={() => setSelectedOrder(order)}>詳細</button>
-                                {!isAmazon && order.status !== 'review_requested' && order.status !== 'completed' && (
-                                  <button
-                                    className="btn btn-email btn-sm"
-                                    onClick={() => sendReviewEmail(order)}
-                                    disabled={sendingEmail === order.order_number}
-                                    title="レビュー依頼メール送信"
-                                  >
-                                    {sendingEmail === order.order_number ? '送信中…' : '📧'}
-                                  </button>
-                                )}
+                                <button
+                                  className="btn btn-email btn-sm"
+                                  onClick={() => sendReviewEmail(order)}
+                                  disabled={sendingEmail === order.order_number}
+                                  title="お写真報告メール送信"
+                                >
+                                  {sendingEmail === order.order_number ? '送信中…' : '📧'}
+                                </button>
                               </div>
                             </td>
                           </tr>
