@@ -159,9 +159,9 @@ export default function Home() {
       } else {
         showToast(data.error || 'アップロードに失敗しました', 'error');
       }
-    } catch (err) {
-      console.error('Compression error:', err);
-      showToast('画像の処理に失敗しました', 'error');
+    } catch (err: any) {
+      console.error('Upload Error:', err);
+      showToast(`失敗しました: ${err.message || '不明なエラー'}`, 'error');
     } finally {
       setUploadingOrderImage(false);
     }
