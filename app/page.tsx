@@ -707,6 +707,7 @@ export default function Home() {
                       ref={orderFileInputRef}
                       type="file"
                       accept="image/*"
+                      capture="environment"
                       className="file-input"
                       onChange={e => {
                         const file = e.target.files?.[0];
@@ -820,6 +821,7 @@ export default function Home() {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                capture="environment"
                 className="file-input"
                 onChange={e => setProductImageFile(e.target.files?.[0] || null)}
               />
