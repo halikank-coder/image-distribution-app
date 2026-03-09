@@ -55,7 +55,7 @@ export default function Home() {
   const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, image_sent: 0, review_requested: 0, completed: 0 });
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('pending');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
