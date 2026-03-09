@@ -274,7 +274,7 @@ export default function Home() {
         showToast('✅ お写真報告メールを送信しました！');
         fetchOrders();
         if (selectedOrder?.order_number === order.order_number) {
-          setSelectedOrder({ ...selectedOrder, status: 'image_sent' });
+          setSelectedOrder({ ...selectedOrder, status: 'sent' });
         }
       } else {
         showToast(data.error || 'メール送信に失敗しました', 'error');
@@ -338,8 +338,6 @@ export default function Home() {
     setSidebarOpen(false);
   };
 
-  const isAmazonEmail = (email: string) => email.includes('marketplace.amazon');
-
   return (
     <div className="app-shell">
       {/* Mobile overlay */}
@@ -379,7 +377,7 @@ export default function Home() {
           <>
             <div className="page-header">
               <h2>注文一覧</h2>
-              <p>画像配信・レビュー依頼状況を管理します</p>
+              <p>画像配信・お写真報告状況を管理します</p>
             </div>
 
             <div className="stats-grid">
@@ -489,7 +487,6 @@ export default function Home() {
                     <tbody>
                       {orders.map(order => {
                         const product = productMap[order.product_sku];
-                        const isAmazon = isAmazonEmail(order.customer_email || '');
                         return (
                           <tr key={order.id} className={selectedOrderIds.includes(order.order_number) ? 'row-selected' : ''}>
                             <td>
