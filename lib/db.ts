@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase';
+export { supabaseAdmin };
 
 export type Order = {
   id: number;
@@ -11,7 +12,7 @@ export type Order = {
   recipient_name: string;
   gift_message: string;
   product_sku: string;
-  status: 'pending' | 'image_sent' | 'review_requested' | 'completed';
+  status: 'pending' | 'captured' | 'sent' | 'completed';
   notes: string;
   imported_at: string;
   updated_at: string;
@@ -104,8 +105,8 @@ export async function getOrderStats() {
   return {
     total: rows.length,
     pending: rows.filter(r => r.status === 'pending').length,
-    image_sent: rows.filter(r => r.status === 'image_sent').length,
-    review_requested: rows.filter(r => r.status === 'review_requested').length,
+    captured: rows.filter(r => r.status === 'captured').length,
+    sent: rows.filter(r => r.status === 'sent').length,
     completed: rows.filter(r => r.status === 'completed').length,
   };
 }
