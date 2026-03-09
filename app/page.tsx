@@ -68,6 +68,8 @@ export default function Home() {
   const [dragOver, setDragOver] = useState(false);
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +125,75 @@ export default function Home() {
     }
     setProductImageFile(null);
     setShowProductModal(true);
+  };
+
+  const toggleSelectOrder = (orderNumber: string) => {
+    setSelectedOrderIds(prev =>
+      prev.includes(orderNumber) ? prev.filter(id => id !== orderNumber) : [...prev, orderNumber]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedOrderIds.length === orders.length) {
+      setSelectedOrderIds([]);
+    } else {
+      setSelectedOrderIds(orders.map(o => o.order_number));
+    }
+  };
+
+  const bulkUpdateStatus = async (status: string) => {
+    if (selectedOrderIds.length === 0) return;
+    if (!confirm(`選択した ${selectedOrderIds.length} 個の注文を「${STATUS_LABELS[status]}」に更新しますか？`)) return;
+
+    setBulkProcessing(true);
+    try {
+      await Promise.all(selectedOrderIds.map(id => fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_number: id, status }),
+      })));
+      showToast(`${selectedOrderIds.length}件を「${STATUS_LABELS[status]}」に更新しました`);
+      setSelectedOrderIds([]);
+      fetchOrders();
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const bulkSendEmails = async () => {
+    const targets = orders.filter(o => selectedOrderIds.includes(o.order_number) && !isAmazonEmail(o.customer_email || ''));
+    if (targets.length === 0) {
+      showToast('送信可能な注文が選択されていません', 'error');
+      return;
+    }
+
+    if (!confirm(`選択した ${targets.length} 件の注文にレビュー依頼メールを一括送信しますか？\n（Amazon匿名アドレスは除外されます）`)) return;
+
+    setBulkProcessing(true);
+    let successCount = 0;
+    try {
+      for (const order of targets) {
+        const product = productMap[order.product_sku];
+        const res = await fetch('/api/send-review-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_number: order.order_number,
+            customer_email: order.customer_email,
+            customer_name: order.customer_name,
+            recipient_name: order.recipient_name,
+            product_sku: order.product_sku,
+            image_path: product?.image_path,
+          }),
+        });
+        if (res.ok) successCount++;
+      }
+      showToast(`✅ ${successCount}件のメール送信を完了しました`);
+      setSelectedOrderIds([]);
+      fetchOrders();
+    } finally {
+      setBulkProcessing(false);
+    }
   };
 
   const sendReviewEmail = async (order: Order) => {
@@ -298,6 +369,29 @@ export default function Home() {
                 </div>
               </div>
 
+              {selectedOrderIds.length > 0 && (
+                <div className="bulk-actions-bar">
+                  <span className="selected-count">{selectedOrderIds.length}件 選択中</span>
+                  <div className="bulk-buttons">
+                    <button
+                      className="btn btn-email btn-sm"
+                      onClick={bulkSendEmails}
+                      disabled={bulkProcessing}
+                    >
+                      {bulkProcessing ? '処理中...' : '📧 一括メール送信'}
+                    </button>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => bulkUpdateStatus('completed')}
+                      disabled={bulkProcessing}
+                    >
+                      ✅ 一括完了にする
+                    </button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setSelectedOrderIds([])}>解除</button>
+                  </div>
+                </div>
+              )}
+
               <div className="table-wrap">
                 {loading ? (
                   <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
@@ -311,6 +405,13 @@ export default function Home() {
                   <table>
                     <thead>
                       <tr>
+                        <th style={{ width: '40px' }}>
+                          <input
+                            type="checkbox"
+                            checked={orders.length > 0 && selectedOrderIds.length === orders.length}
+                            onChange={toggleSelectAll}
+                          />
+                        </th>
                         <th>画像</th>
                         <th>受注番号</th>
                         <th className="hide-mobile">GoQ番号</th>
@@ -328,7 +429,14 @@ export default function Home() {
                         const product = productMap[order.product_sku];
                         const isAmazon = isAmazonEmail(order.customer_email || '');
                         return (
-                          <tr key={order.id}>
+                          <tr key={order.id} className={selectedOrderIds.includes(order.order_number) ? 'row-selected' : ''}>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={selectedOrderIds.includes(order.order_number)}
+                                onChange={() => toggleSelectOrder(order.order_number)}
+                              />
+                            </td>
                             <td
                               onClick={() => openProductBySku(order.product_sku)}
                               style={{ cursor: 'pointer' }}

@@ -977,3 +977,49 @@ tbody td.small {
     max-width: 100%;
   }
 }
+
+/* Bulk Actions Bar */
+.bulk-actions-bar {
+  background: var(--accent-glow);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--accent-primary);
+  animation: slideInDown 0.2s ease;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.selected-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-secondary);
+}
+
+.bulk-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.row-selected {
+  background: rgba(108, 99, 255, 0.05) !important;
+}
+
+/* Checkbox style override */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
