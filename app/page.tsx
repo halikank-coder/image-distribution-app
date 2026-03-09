@@ -112,6 +112,19 @@ export default function Home() {
     fetchOrders();
   };
 
+  const openProductBySku = (sku: string) => {
+    const product = products.find(p => p.sku === sku);
+    if (product) {
+      setEditProduct(product);
+      setProductForm({ sku: product.sku, name: product.name });
+    } else {
+      setEditProduct(null);
+      setProductForm({ sku: sku, name: '' });
+    }
+    setProductImageFile(null);
+    setShowProductModal(true);
+  };
+
   const sendReviewEmail = async (order: Order) => {
     if (sendingEmail) return;
     if (!order.customer_email || order.customer_email.includes('marketplace')) {
@@ -316,12 +329,16 @@ export default function Home() {
                         const isAmazon = isAmazonEmail(order.customer_email || '');
                         return (
                           <tr key={order.id}>
-                            <td>
+                            <td
+                              onClick={() => openProductBySku(order.product_sku)}
+                              style={{ cursor: 'pointer' }}
+                              title="タップして画像を登録/変更"
+                            >
                               {product?.image_path ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={product.image_path} alt={product.name} className="product-thumb" />
+                                <img src={product.image_path} alt={product.name} className="product-thumb-clickable" />
                               ) : (
-                                <div className="no-image-thumb">🌸</div>
+                                <div className="no-image-thumb-clickable">🌸</div>
                               )}
                             </td>
                             <td className="small muted">{order.order_number}</td>
