@@ -72,7 +72,9 @@ export default function Home() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const orderFileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const orderCameraInputRef = useRef<HTMLInputElement>(null);
+  const orderGalleryInputRef = useRef<HTMLInputElement>(null);
   const csvInputRef = useRef<HTMLInputElement>(null);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
@@ -700,11 +702,16 @@ export default function Home() {
                         <button className="btn-delete-img" onClick={() => handleDeleteOrderImage(img.id, img.image_path)}>✕</button>
                       </div>
                     ))}
-                    <div className="image-add-card" onClick={() => orderFileInputRef.current?.click()}>
-                      {uploadingOrderImage ? <div className="spinner" /> : <span>+ 追加</span>}
+                    <div className="image-add-buttons">
+                      <div className="image-add-card small" onClick={() => orderCameraInputRef.current?.click()} title="カメラで撮影">
+                        {uploadingOrderImage ? <div className="spinner" /> : <span>📷 撮影</span>}
+                      </div>
+                      <div className="image-add-card small" onClick={() => orderGalleryInputRef.current?.click()} title="アルバムから選択">
+                        <span>🖼️ 選択</span>
+                      </div>
                     </div>
                     <input
-                      ref={orderFileInputRef}
+                      ref={orderCameraInputRef}
                       type="file"
                       accept="image/*"
                       capture="environment"
@@ -712,7 +719,18 @@ export default function Home() {
                       onChange={e => {
                         const file = e.target.files?.[0];
                         if (file) handleOrderImageUpload(file);
-                        e.target.value = ''; // 連続で同じファイルを選択可能に
+                        e.target.value = '';
+                      }}
+                    />
+                    <input
+                      ref={orderGalleryInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="file-input"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleOrderImageUpload(file);
+                        e.target.value = '';
                       }}
                     />
                   </div>
@@ -813,15 +831,28 @@ export default function Home() {
                   style={{ flex: 1 }}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {productImageFile ? `✅ ${productImageFile.name}` : '📷 写真を撮る / 選択'}
+                  {productImageFile ? `✅ ${productImageFile.name}` : '📷 撮影'}
+                </div>
+                <div
+                  className="image-upload-area"
+                  style={{ flex: 1 }}
+                  onClick={() => galleryInputRef.current?.click()}
+                >
+                  {productImageFile ? '🔄 変更' : '🖼️ 選択'}
                 </div>
               </div>
-              {/* capture="environment" でスマホのリアカメラを起動 */}
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 capture="environment"
+                className="file-input"
+                onChange={e => setProductImageFile(e.target.files?.[0] || null)}
+              />
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
                 className="file-input"
                 onChange={e => setProductImageFile(e.target.files?.[0] || null)}
               />
