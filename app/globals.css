@@ -887,9 +887,7 @@ tbody td.small {
   cursor: not-allowed;
 }
 
-/* Hide on mobile */
-.hide-mobile {}
-
+/* Hide on mobile classes are defined in media query below */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
