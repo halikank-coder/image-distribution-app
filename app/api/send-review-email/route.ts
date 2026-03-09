@@ -25,6 +25,14 @@ export async function POST(req: NextRequest) {
       ? `${recipient_name}様（ご注文者: ${customer_name}様）`
       : `${customer_name}様`;
 
+    const imagesToDisplay = image_paths && image_paths.length > 0 ? image_paths : (image_path ? [image_path] : []);
+
+    const imageSection = imagesToDisplay.map((url: string) => `
+    <div style="margin:20px 0;text-align:center;">
+      <img src="${url}" alt="ご注文商品" style="max-width:100%;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:10px;">
+    </div>
+    `).join('');
+
     const mailOptions = {
       from: `"シラハナ フラワー" <${process.env.SMTP_USER || 'info@sirahana.com'}>`,
       to: customer_email,
@@ -47,13 +55,7 @@ export async function POST(req: NextRequest) {
       商品の画像を添付しておりますのでご確認ください。
     </p>
 
-    const imagesToDisplay = image_paths && image_paths.length > 0 ? image_paths : (image_path ? [image_path] : []);
-
-    const imageSection = imagesToDisplay.map((url: string) => `
-        < div style="margin:20px 0;text-align:center;" >
-        <img src="${url}" alt = "ご注文商品" style="max-width:100%;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:10px;" >
-        </div>
-          `).join('');
+    ${imageSection}
 
     <p style="margin:0 0 20px;">
       よろしければ、簡単で構いませんので、率直な感想や使用感などの【商品レビュー】を書いて頂けると幸いです。<br>
