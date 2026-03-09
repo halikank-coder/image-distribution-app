@@ -29,8 +29,8 @@ type Product = {
 type Stats = {
   total: number;
   pending: number;
-  image_sent: number;
-  review_requested: number;
+  captured: number;
+  sent: number;
   completed: number;
 };
 
@@ -53,7 +53,7 @@ type Page = 'orders' | 'import' | 'products';
 export default function Home() {
   const [page, setPage] = useState<Page>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, image_sent: 0, review_requested: 0, completed: 0 });
+  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, captured: 0, sent: 0, completed: 0 });
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('pending');
@@ -88,7 +88,7 @@ export default function Home() {
       const res = await fetch(`/api/orders?${params}`);
       const data = await res.json();
       setOrders(data.orders || []);
-      setStats(data.stats || { total: 0, pending: 0, image_sent: 0, review_requested: 0, completed: 0 });
+      setStats(data.stats || { total: 0, pending: 0, captured: 0, sent: 0, completed: 0 });
     } catch {
       showToast('データの取得に失敗しました', 'error');
     } finally {
