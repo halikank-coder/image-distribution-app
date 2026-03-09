@@ -212,13 +212,13 @@ export default function Home() {
   };
 
   const bulkSendEmails = async () => {
-    const targets = orders.filter(o => selectedOrderIds.includes(o.order_number) && !isAmazonEmail(o.customer_email || ''));
+    const targets = orders.filter(o => selectedOrderIds.includes(o.order_number));
     if (targets.length === 0) {
-      showToast('送信可能な注文が選択されていません', 'error');
+      showToast('送信対象が選択されていません', 'error');
       return;
     }
 
-    if (!confirm(`選択した ${targets.length} 件の注文にレビュー依頼メールを一括送信しますか？\n（Amazon匿名アドレスは除外されます）`)) return;
+    if (!confirm(`選択した ${targets.length} 件の注文にお写真報告メールを一括送信しますか？`)) return;
 
     setBulkProcessing(true);
     let successCount = 0;
@@ -745,21 +745,14 @@ export default function Home() {
                       {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
 
-                    {!isAmazon && (
-                      <button
-                        className="btn btn-email"
-                        style={{ width: '100%', justifyContent: 'center' }}
-                        onClick={() => sendReviewEmail(selectedOrder)}
-                        disabled={!!sendingEmail}
-                      >
-                        📧 レビュー依頼メールを送信する
-                      </button>
-                    )}
-                    {isAmazon && (
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px' }}>
-                        ※ Amazon匿名アドレスのため直接メール送信はできません
-                      </p>
-                    )}
+                    <button
+                      className="btn btn-email"
+                      style={{ width: '100%', justifyContent: 'center' }}
+                      onClick={() => sendReviewEmail(selectedOrder)}
+                      disabled={!!sendingEmail}
+                    >
+                      📧 お写真報告メールを送信する
+                    </button>
                   </div>
                 </div>
               );
