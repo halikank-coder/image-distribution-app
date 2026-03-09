@@ -118,7 +118,8 @@ export default function Home() {
       showToast('このメールアドレスには送信できません（Amazon匿名アドレス）', 'error');
       return;
     }
-    if (!confirm(`${order.customer_name}様へレビュー依頼メールを送信しますか？\n送信先: ${order.customer_email}`)) return;
+    const product = productMap[order.product_sku];
+    if (!confirm(`${order.customer_name}様へレビュー依頼メールを送信しますか？\n\n【送信内容の確認】\n・宛先: ${order.customer_email}\n・注文番号: ${order.order_number}\n・商品名: ${product?.name || order.product_sku}\n・画像: ${product?.image_path ? 'あり' : 'なし'}\n\n※「OK」を押すと送信されます。`)) return;
 
     setSendingEmail(order.order_number);
     try {
@@ -131,6 +132,7 @@ export default function Home() {
           customer_name: order.customer_name,
           recipient_name: order.recipient_name,
           product_sku: order.product_sku,
+          image_path: product?.image_path,
         }),
       });
       const data = await res.json();
