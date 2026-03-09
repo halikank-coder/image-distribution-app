@@ -1122,3 +1122,33 @@ input[type="checkbox"] {
   cursor: pointer;
   accent-color: var(--accent-primary);
 }
+
+.image-add-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.image-add-card.small {
+  flex: 1;
+  height: 60px;
+  min-width: 0;
+  font-size: 13px;
+  background: var(--bg-secondary);
+  border: 2px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.image-add-card.small:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-secondary);
+}
