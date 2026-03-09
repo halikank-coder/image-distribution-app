@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
             .from('product-images')
             .upload(filePath, imageFile, { upsert: true });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+            console.error('Supabase Storage Upload Error:', uploadError);
+            throw uploadError;
+        }
 
         // 2. Get Public URL
         const { data: { publicUrl } } = supabaseAdmin.storage
