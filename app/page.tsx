@@ -114,17 +114,53 @@ export default function Home() {
     fetchOrders();
   };
 
-  const openProductBySku = (sku: string) => {
-    const product = products.find(p => p.sku === sku);
-    if (product) {
-      setEditProduct(product);
-      setProductForm({ sku: product.sku, name: product.name });
-    } else {
-      setEditProduct(null);
-      setProductForm({ sku: sku, name: '' });
+  const [selectedOrderImages, setSelectedOrderImages] = useState<{ id: number; image_path: string }[]>([]);
+  const [uploadingOrderImage, setUploadingOrderImage] = useState(false);
+
+  const fetchOrderImages = async (orderNumber: string) => {
+    const res = await fetch(`/api/order-images?order_number=${orderNumber}`);
+    const data = await res.json();
+    setSelectedOrderImages(data.images || []);
+  };
+
+  const openOrderImageEditor = (order: Order) => {
+    setSelectedOrder(order);
+    fetchOrderImages(order.order_number);
+    // モーダル表示などは setSelectedOrder(order) で詳細モーダルが開く既存ロジックを利用
+  };
+
+  const handleOrderImageUpload = async (file: File) => {
+    if (!selectedOrder) return;
+    setUploadingOrderImage(true);
+    const form = new FormData();
+    form.append('order_number', selectedOrder.order_number);
+    form.append('image', file);
+    try {
+      const res = await fetch('/api/order-images', { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) {
+        showToast('画像をアップロードしました');
+        fetchOrderImages(selectedOrder.order_number);
+      } else {
+        showToast(data.error || 'アップロードに失敗しました', 'error');
+      }
+    } finally {
+      setUploadingOrderImage(false);
     }
-    setProductImageFile(null);
-    setShowProductModal(true);
+  };
+
+  const handleDeleteOrderImage = async (id: number, path: string) => {
+    if (!confirm('この画像を削除しますか？')) return;
+    try {
+      const res = await fetch(`/api/order-images/${id}?path=${encodeURIComponent(path)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('画像を削除しました');
+        if (selectedOrder) fetchOrderImages(selectedOrder.order_number);
+      }
+    } catch {
+      showToast('削除に失敗しました', 'error');
+    }
   };
 
   const toggleSelectOrder = (orderNumber: string) => {
@@ -203,9 +239,11 @@ export default function Home() {
       return;
     }
     const product = productMap[order.product_sku];
-    if (!confirm(`${order.customer_name}様へレビュー依頼メールを送信しますか？\n\n【送信内容の確認】\n・宛先: ${order.customer_email}\n・注文番号: ${order.order_number}\n・商品名: ${product?.name || order.product_sku}\n・画像: ${product?.image_path ? 'あり' : 'なし'}\n\n※「OK」を押すと送信されます。`)) return;
+    const images = selectedOrderImages.length > 0 ? selectedOrderImages : (product?.image_path ? [{ id: 0, image_path: product.image_path }] : []);
 
-    setSendingEmail(order.order_number);
+    if (!confirm(`${order.customer_name}様へレビュー依頼メールを送信しますか？\n\n【送信内容の確認】\n・宛先: ${order.customer_email}\n・注文番号: ${order.order_number}\n・商品名: ${product?.name || order.product_sku}\n・画像: ${images.length > 0 ? `${images.length}枚` : 'なし'}\n\n※「OK」を押すと送信されます。`)) return;
+
+    setBulkProcessing(true); // 送信中表示用
     try {
       const res = await fetch('/api/send-review-email', {
         method: 'POST',
@@ -216,7 +254,8 @@ export default function Home() {
           customer_name: order.customer_name,
           recipient_name: order.recipient_name,
           product_sku: order.product_sku,
-          image_path: product?.image_path,
+          image_path: images[0]?.image_path, // 代表1枚を送信（複数対応はAPI側で調整可能）
+          image_paths: images.map(img => img.image_path), // 全画像パスを渡す
         }),
       });
       const data = await res.json();
@@ -450,16 +489,17 @@ export default function Home() {
                               />
                             </td>
                             <td
-                              onClick={() => openProductBySku(order.product_sku)}
+                              onClick={() => openOrderImageEditor(order)}
                               style={{ cursor: 'pointer' }}
-                              title="タップして画像を登録/変更"
+                              title="タップしてこの注文の写真を撮影/管理"
                             >
-                              {product?.image_path ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={product.image_path} alt={product.name} className="product-thumb-clickable" />
-                              ) : (
-                                <div className="no-image-thumb-clickable">🌸</div>
-                              )}
+                              <div className="order-thumb-container">
+                                {order.status === 'image_sent' || order.status === 'review_requested' ? (
+                                  <div className="order-thumb-ready">📸</div>
+                                ) : (
+                                  <div className="no-image-thumb-clickable">🌸</div>
+                                )}
+                              </div>
                             </td>
                             <td className="small muted">{order.order_number}</td>
                             <td className="small muted hide-mobile">{order.goq_number}</td>
@@ -641,10 +681,24 @@ export default function Home() {
               const isAmazon = isAmazonEmail(selectedOrder.customer_email || '');
               return (
                 <div>
-                  {product?.image_path && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.image_path} alt={product.name} style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }} />
-                  )}
+                  <div className="order-images-preview">
+                    {selectedOrderImages.length === 0 && product?.image_path && (
+                      <div className="image-item sku-default">
+                        <img src={product.image_path} alt="" />
+                        <span className="badge-sku">SKU既定</span>
+                      </div>
+                    )}
+                    {selectedOrderImages.map(img => (
+                      <div key={img.id} className="image-item">
+                        <img src={img.image_path} alt="" />
+                        <button className="btn-delete-img" onClick={() => handleDeleteOrderImage(img.id, img.image_path)}>✕</button>
+                      </div>
+                    ))}
+                    <div className="image-add-card" onClick={() => fileInputRef.current?.click()}>
+                      {uploadingOrderImage ? <div className="spinner" /> : <span>+ 追加</span>}
+                    </div>
+                  </div>
+
                   <dl className="order-detail">
                     <dt>受注番号</dt><dd>{selectedOrder.order_number}</dd>
                     <dt>GoQ管理番号</dt><dd>{selectedOrder.goq_number}</dd>

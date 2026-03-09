@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { order_number, customer_email, customer_name, recipient_name, product_sku, image_path } = body;
+    const { order_number, customer_email, customer_name, recipient_name, product_sku, image_path, image_paths } = body;
 
     if (!order_number || !customer_email) {
       return NextResponse.json({ error: '必須パラメータが不足しています' }, { status: 400 });
@@ -47,11 +47,13 @@ export async function POST(req: NextRequest) {
       商品の画像を添付しておりますのでご確認ください。
     </p>
 
-    ${image_path ? `
-    <div style="margin:20px 0;text-align:center;">
-      <img src="${image_path}" alt="ご注文商品" style="max-width:100%;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-    </div>
-    ` : ''}
+    const imagesToDisplay = image_paths && image_paths.length > 0 ? image_paths : (image_path ? [image_path] : []);
+
+    const imageSection = imagesToDisplay.map((url: string) => `
+        < div style="margin:20px 0;text-align:center;" >
+        <img src="${url}" alt = "ご注文商品" style="max-width:100%;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:10px;" >
+        </div>
+          `).join('');
 
     <p style="margin:0 0 20px;">
       よろしければ、簡単で構いませんので、率直な感想や使用感などの【商品レビュー】を書いて頂けると幸いです。<br>

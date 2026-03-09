@@ -58,6 +58,33 @@ export async function upsertOrder(order: Omit<Order, 'id' | 'imported_at' | 'upd
   if (error) throw error;
 }
 
+export async function getOrderImages(order_number: string) {
+  const { data, error } = await supabaseAdmin
+    .from('order_images')
+    .select('*')
+    .eq('order_number', order_number)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function addOrderImage(order_number: string, image_path: string) {
+  const { data, error } = await supabaseAdmin
+    .from('order_images')
+    .insert([{ order_number, image_path }])
+    .select();
+  if (error) throw error;
+  return data[0];
+}
+
+export async function deleteOrderImage(id: number) {
+  const { error } = await supabaseAdmin
+    .from('order_images')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
 export async function updateOrderStatus(orderNumber: string, status: string, notes?: string): Promise<void> {
   const update: Record<string, string> = { status, updated_at: new Date().toISOString() };
   if (notes !== undefined) update.notes = notes;
