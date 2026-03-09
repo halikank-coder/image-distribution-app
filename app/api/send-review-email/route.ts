@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const mailOptions = {
       from: `"シラハナ フラワー" <${process.env.SMTP_USER || 'info@sirahana.com'}>`,
       to: customer_email,
-      subject: '【シラハナフラワー】ご注文商品の発送前のご報告（お写真付き）',
+      subject: `【白坂花店】お届けするお花の画像をご用意いたしました（ご注文番号：${order_number}）`,
       html: `
 <!DOCTYPE html>
 <html lang="ja">
@@ -46,28 +46,40 @@ export async function POST(req: NextRequest) {
 </head>
 <body style="margin:0;padding:20px;background:#fff;font-family:'Hiragino Sans','Meiryo',sans-serif;color:#333;line-height:1.8;">
   <div style="max-width:600px;margin:0 auto;border:1px solid #eee;padding:30px;border-radius:8px;">
-    <p style="margin:0 0 20px;">${recipientDisplay}</p>
-    
-    <p style="margin:0 0 20px;font-weight:bold;">この度はシラハナフラワーへのご注文、誠にありがとうございます。</p>
+    <p style="margin:0 0 20px;">${customer_name} 様</p>
     
     <p style="margin:0 0 20px;">
-      ご注文いただきました商品（受注番号: ${order_number}）の発送準備が整いました。<br>
-      実際にお届けするお花の状態を事前にご確認いただけるよう、撮影したお写真を本メールに添付いたしました。
+      この度は、数あるショップの中から白坂花店にてご注文いただき、誠にありがとうございます。
     </p>
 
-    <div style="margin:20px 0;text-align:center;color:#666;font-size:14px;">
-      （※お写真は本メールの添付ファイルとしてもご確認いただけます）
+    <p style="margin:0 0 20px;">
+      本日、お客様よりご注文いただきましたお花の発送手配が完了いたしました。<br>
+      大切な贈り物として、またご自宅用としてお選びいただいたお花が、どのような状態でお手元（またはお届け先）に向かっているのかご確認いただけるよう、実際に制作したお写真を添付してお送りいたします。
+    </p>
+
+    <p style="margin:0 0 20px;font-weight:bold;">
+      ぜひ、添付の画像にて実物のお花をご覧くださいませ。
+    </p>
+
+    <div style="margin:30px 0;padding:20px;background:#f9f9f9;border-radius:8px;">
+      <p style="margin:0 0 10px;font-weight:bold;">【お客様へのお願い】</p>
+      <p style="margin:0;font-size:14px;">
+        当店では、お客様からのお声（商品レビュー）を何よりの励みとし、今後のデザインや品質向上のための大切な参考とさせていただいております。<br><br>
+        もしよろしければ、お花が無事に到着いたしましたら、Amazonの「注文履歴」より、率直なご感想をお聞かせいただけますと大変嬉しく存じます。<br>
+        お客様のリアルなお声が、これからお花選びをされる多くの方にとって一番の参考となります。
+      </p>
     </div>
 
     <p style="margin:0 0 20px;">
-      お届けまで今しばらくお待ちくださいませ。<br>
-      何か到着した商品に不備や問題などありましたら、お手数ですが本メールへの返信にてご連絡をいただけますと幸いです。
+      商品の到着まで、今しばらくお待ちくださいませ。<br>
+      この度は白坂花店をご利用いただき、心より感謝申し上げます。
     </p>
 
     <hr style="border:0;border-top:1px solid #eee;margin:30px 0;">
-    <p style="margin:0;font-size:12px;color:#888;text-align:center;">
-      シラハナフラワー<br>
-      info@sirahana.com
+    <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
+      白坂花店<br>
+      住所：香川県高松市宮脇町2丁目29-5<br>
+      Email: info@sirahana.com
     </p>
   </div>
 </body>
