@@ -333,19 +333,31 @@ export default function Home() {
             </div>
 
             <div className="stats-grid">
-              <div className="stat-card total">
+              <div
+                className={`stat-card total ${filterStatus === 'all' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('all')}
+              >
                 <div className="stat-label">総注文数</div>
                 <div className="stat-value">{stats.total}</div>
               </div>
-              <div className="stat-card pending">
+              <div
+                className={`stat-card pending ${filterStatus === 'pending' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('pending')}
+              >
                 <div className="stat-label">未対応</div>
                 <div className="stat-value">{stats.pending}</div>
               </div>
-              <div className="stat-card sent">
-                <div className="stat-label">画像送付済</div>
+              <div
+                className={`stat-card sent ${filterStatus === 'image_sent' || filterStatus === 'review_requested' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('image_sent')}
+              >
+                <div className="stat-label">画像送付済/依頼済</div>
                 <div className="stat-value">{stats.image_sent + stats.review_requested}</div>
               </div>
-              <div className="stat-card done">
+              <div
+                className={`stat-card done ${filterStatus === 'completed' ? 'active' : ''}`}
+                onClick={() => setFilterStatus('completed')}
+              >
                 <div className="stat-label">完了</div>
                 <div className="stat-value">{stats.completed}</div>
               </div>

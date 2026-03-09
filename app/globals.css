@@ -178,11 +178,20 @@ body {
   border-radius: var(--radius);
   padding: 20px;
   transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
 }
 
 .stat-card:hover {
-  border-color: var(--border-light);
-  transform: translateY(-1px);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  background: var(--bg-card-hover);
+}
+
+.stat-card.active {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .stat-label {
