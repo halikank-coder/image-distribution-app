@@ -12,6 +12,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// デバッグ用: パスワードの設定状況を確認
+if (!process.env.SMTP_PASS) {
+  console.error('CRITICAL: SMTP_PASS is NOT defined in environment variables!');
+} else {
+  console.log('DEBUG: SMTP_PASS is defined (length:', process.env.SMTP_PASS.length, ')');
+}
+
 export async function POST(req: NextRequest) {
   try {
     // SMTP接続の事前確認
