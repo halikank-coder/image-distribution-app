@@ -14,6 +14,18 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: NextRequest) {
   try {
+    // SMTP接続の事前確認
+    try {
+      await transporter.verify();
+      console.log('SMTP connection verified');
+    } catch (verifyError: any) {
+      console.error('SMTP Verify Error:', verifyError);
+      return NextResponse.json({
+        error: `SMTP接続エラー: ${verifyError.message}`,
+        details: '認証情報またはサーバー設定を確認してください'
+      }, { status: 500 });
+    }
+
     const body = await req.json();
     const { order_number, customer_email, customer_name, recipient_name, product_sku, image_path, image_paths } = body;
 
