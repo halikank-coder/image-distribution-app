@@ -86,20 +86,16 @@ export async function POST(req: NextRequest) {
       この度は白坂花店をご利用いただき、心より感謝申し上げます。
     </p>
 
+    ${imageSection}
+
     <hr style="border:0;border-top:1px solid #eee;margin:30px 0;">
     <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
-      白坂花店<br>
-      住所：香川県高松市宮脇町2丁目29-5
+      白坂花店
     </p>
   </div>
 </body>
 </html>
       `.trim(),
-      attachments: imagesToDisplay.map((url: string, index: number) => ({
-        filename: `flower_${index + 1}.jpg`,
-        path: url,
-        cid: `flower_image_${index}` // HTML内で <img src="cid:..." /> を使う場合用
-      }))
     };
 
     await transporter.sendMail(mailOptions);
