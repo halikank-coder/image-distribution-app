@@ -33,10 +33,14 @@ export async function POST(req: NextRequest) {
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${order_number}_${Date.now()}.${fileExt}`;
         const filePath = `orders/${order_number}/${fileName}`;
+        const buffer = Buffer.from(await imageFile.arrayBuffer());
 
         const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
             .from('product-images')
-            .upload(filePath, imageFile, { upsert: true });
+            .upload(filePath, buffer, {
+                contentType: imageFile.type,
+                upsert: true
+            });
 
         if (uploadError) {
             console.error('Supabase Storage Upload Error:', uploadError);
