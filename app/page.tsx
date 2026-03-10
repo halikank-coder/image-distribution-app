@@ -281,8 +281,13 @@ export default function Home() {
         }
       } else {
         showToast(data.error || 'メール送信に失敗しました', 'error');
+        if (data.details) console.error('Email error details:', data.details);
       }
+    } catch (err: any) {
+      console.error('Send Email error:', err);
+      showToast(`送信エラー: ${err.message || '不明なエラー'}`, 'error');
     } finally {
+      setBulkProcessing(false);
       setSendingEmail(null);
     }
   };
