@@ -93,13 +93,17 @@ export async function POST(req: NextRequest) {
     };
 
     await transporter.sendMail(mailOptions);
+    console.log('Mail sent successfully to:', customer_email);
 
     // ステータスを「送信済」に自動更新
     await updateOrderStatus(order_number, 'sent');
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error('Mail send error:', err);
-    return NextResponse.json({ error: 'メール送信に失敗しました' }, { status: 500 });
+  } catch (err: any) {
+    console.error('Mail send error details:', err);
+    return NextResponse.json({
+      error: `メール送信失敗: ${err.message || '不明なエラー'}`,
+      details: err.code || err.command
+    }, { status: 500 });
   }
 }
