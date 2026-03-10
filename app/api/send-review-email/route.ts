@@ -81,15 +81,6 @@ export async function POST(req: NextRequest) {
       ぜひ、添付の画像にて実物のお花をご覧くださいませ。
     </p>
 
-    <div style="margin:30px 0;padding:20px;background:#f9f9f9;border-radius:8px;">
-      <p style="margin:0 0 10px;font-weight:bold;">【お客様へのお願い】</p>
-      <p style="margin:0;font-size:14px;">
-        当店では、お客様からのお声（商品レビュー）を何よりの励みとし、今後のデザインや品質向上のための大切な参考とさせていただいております。<br><br>
-        もしよろしければ、お花が無事に到着いたしましたら、Amazonの「注文履歴」より、率直なご感想をお聞かせいただけますと大変嬉しく存じます。<br>
-        お客様のリアルなお声が、これからお花選びをされる多くの方にとって一番の参考となります。
-      </p>
-    </div>
-
     <p style="margin:0 0 20px;">
       商品の到着まで、今しばらくお待ちくださいませ。<br>
       この度は白坂花店をご利用いただき、心より感謝申し上げます。
@@ -98,8 +89,7 @@ export async function POST(req: NextRequest) {
     <hr style="border:0;border-top:1px solid #eee;margin:30px 0;">
     <p style="margin:0;font-size:14px;color:#333;line-height:1.6;">
       白坂花店<br>
-      住所：香川県高松市宮脇町2丁目29-5<br>
-      Email: info@sirahana.com
+      住所：香川県高松市宮脇町2丁目29-5
     </p>
   </div>
 </body>
