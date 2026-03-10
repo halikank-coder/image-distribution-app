@@ -16,7 +16,8 @@ const transporter = nodemailer.createTransport({
 if (!process.env.SMTP_PASS) {
   console.error('CRITICAL: SMTP_PASS is NOT defined in environment variables!');
 } else {
-  console.log('DEBUG: SMTP_PASS is defined (length:', process.env.SMTP_PASS.length, ')');
+  // セキュリティのため長さだけ確認
+  console.log('DEBUG: SMTP_PASS is defined (length:', process.env.SMTP_PASS?.length || 0, ')');
 }
 
 export async function POST(req: NextRequest) {
