@@ -52,8 +52,8 @@ export async function POST(req: NextRequest) {
         const newImage = await addOrderImage(order_number, publicUrl);
 
         return NextResponse.json({ success: true, image: newImage });
-    } catch (err) {
+    } catch (err: any) {
         console.error('Order image upload error:', err);
-        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+        return NextResponse.json({ error: `Upload failed: ${err.message || 'Unknown error'}` }, { status: 500 });
     }
 }
